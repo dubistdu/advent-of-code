@@ -1,25 +1,25 @@
 report = File.readlines("day3-input", chomp: true)
 
-  most_common_value_report = report
-  least_common_value_report = report
+def rating(report, &block)
+  current_report = report
 
   index = 0
-  while most_common_value_report.length > 1
-    current_bits = most_common_value_report.map(&:chars).transpose[index]
-    more_common_bit = current_bits.count("1") >= current_bits.count("0") ? "1" : "0"
-    most_common_value_report = most_common_value_report.select {|a| a[index]==(more_common_bit)}
+  while current_report.length > 1
+    current_bits = current_report.map(&:chars).transpose[index]
+    bit_to_select = yield current_bits # current_bits.count("1") >= current_bits.count("0") ? bit_to_select_if_there_are_more_ones : bit_to_select_if_there_are_more_zeros
+    current_report = current_report.select {|a| a[index]==(bit_to_select)}
     index += 1
   end
-  oxygen_generator_rating = most_common_value_report.first.to_i(2)
-  
-  index = 0
-  while least_common_value_report.length > 1
-    current_bits = least_common_value_report.map(&:chars).transpose[index]
-    least_common_bit = current_bits.count("0") <= current_bits.count("1") ? "0" : "1"
-    least_common_value_report = least_common_value_report.select {|a| a[index]==(least_common_bit)}
-    index += 1
-  end
+  current_report.first.to_i(2)
+end
 
-  co2_scrubber_rating = least_common_value_report.first.to_i(2)
+def oxygen_generator_rating(report)
+  rating(report) { |current_bits| current_bits.count("1") >= current_bits.count("0") ? "1" : "0" }
+end
 
-  p life_support_rating = oxygen_generator_rating * co2_scrubber_rating 
+def co2_scrubber_rating(report)
+  rating(report) { |current_bits| current_bits.count("1") >= current_bits.count("0") ? "0" : "1" }
+end
+
+
+p life_support_rating = oxygen_generator_rating(report) * co2_scrubber_rating(report)
